@@ -1,4 +1,4 @@
-package opgave;
+package oplossing;
 
 public class Node {
     private Node[] children = new Node[3];
@@ -43,6 +43,7 @@ public class Node {
     }
 
     public boolean addChild(Node child){
+        int index = whatChild(child.getValue()[0]);
         for(int i=0 ; i<children.length ; i++){
             if(children[i] == null){
                 children[i] = child;
@@ -52,9 +53,30 @@ public class Node {
         }
         return false;
     }
+    //mag enkel met node met maar 1 key, wordt niet getest, specifiek gebruikt om binaire boom toe te voegen aan 1 sleutel ouder
+    public boolean addNode(Node node){
+        if(addKey(node.getValue()[0])){
+            //organisatie van kinderen bepalen, 2 scenarios: ofwel is teogevoege node kleiner ofwel groter
+            if(keys[1] == node.getValue()[0]){
+                children[1] = node.getChildren()[0];
+                children[2] = node.getChildren()[1];
+            }
+            else{
+                children[2] = children[0];
+                children[0] = node.getChildren()[0];
+                children[1] = node.getChildren()[1];
+            }
+            return true;
+        }
+        return false;
+    }
 
     public void setParent(Node parent){
         this.parent = parent;
+    }
+
+    public Node getParent(){
+        return parent;
     }
 
     public boolean addKey(Comparable key){
