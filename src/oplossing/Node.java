@@ -1,5 +1,7 @@
 package oplossing;
 
+import java.util.Arrays;
+
 public class Node {
     private Node[] children = new Node[3];
     private Comparable[] keys = new Comparable[2];
@@ -30,8 +32,35 @@ public class Node {
         return counter;
     }
 
-    public void removeChild(int index){
-        children[index] = null;
+    public int amountOfKeys(){
+        int count = 0;
+        for(Comparable key : keys){
+            if(key != null){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean removeValue(Comparable o){
+        if(keys[0] == o){
+            keys[0] = keys[1];
+            keys[1] = null;
+            return true;
+        }
+        else if(keys[1] == o){
+            keys[1] = null;
+            return true;
+        }
+        return false;
+    }
+
+    public void removeChild(Node node){
+        for(int i=0 ; i<children.length ; i++){
+            if(children[i] == node){
+                children[i] = null;
+            }
+        }
     }
 
     //naar welk kind(index) zou dit value moeten gaan (gebaseerd op waarde t.o.v. keys) -> kleiner dan key 1 -> links, tussen de twee -> midden etc...
@@ -70,6 +99,9 @@ public class Node {
     }
     //mag enkel met node met maar 1 key, wordt niet getest, specifiek gebruikt om binaire boom toe te voegen aan 1 sleutel ouder
     public boolean addNode(Node node){
+        if(node == null){
+            return false;
+        }
         if(addKey(node.getValue()[0])){
             //organisatie van kinderen bepalen, 2 scenarios: ofwel is teogevoege node kleiner ofwel groter
             if(keys[1] == node.getValue()[0]){
