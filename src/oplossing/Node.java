@@ -1,143 +1,185 @@
 package oplossing;
 
-import java.util.Arrays;
+import java.lang.reflect.Array;
 
-public class Node {
-    private Node[] children = new Node[3];
-    private Comparable[] keys = new Comparable[2];
+public class Node<E extends Comparable<E>> {
+    //private Node<E>[] children = (Node<E>[]) Array.newInstance(this.getClass(), 3);
+    //private E[] keys = (E[]) Array.newInstance(Comparable.class, 2);
+    //private Comparable<E>[] keys = new Comparable[2];
+    private Node<E> child1 = null;
+    private Node<E> child2 = null;
+    private Node<E> child3 = null;
 
-    private Node parent = null;
+    private E key1 = null;
+    private E key2 = null;
 
-    //node word aange
-    public Node(Comparable value){
-        keys[0] = value;
+    public Node<E> getChild1(){
+        return child1;
+    }
+    public Node<E> getChild2(){
+        return child2;
+    }
+    public Node<E> getChild3(){
+        return child3;
     }
 
-    public Comparable[] getValue(){
-        return keys;
+    public Node<E> getChild(int childNr){
+        if(childNr == 1){
+            return child1;
+        }
+        if(childNr == 2){
+            return child2;
+        }
+        if(childNr ==3){
+            return child3;
+        }
+        return null;
+    }
+    public E getKey1(){
+        return key1;
+    }
+
+    public E getKey2(){
+        return key2;
+    }
+
+    private Node<E> parent = null;
+
+
+    //node word aange
+    public Node(E value){
+        key1 = value;
     }
 
     public void clearChildren(){
-        children = new Node[3];
+        child1 = null;
+        child2 = null;
+        child3 = null;
     }
+
 
     //returns amount of empty children
     public int emptyChildren(){
         int counter = 0;
-        for(Node child : children){
-            if(child == null){
-                counter++;
-            }
+        if(child1 == null){
+            counter++;
+        }
+        if(child2 == null){
+            counter++;
+        }
+        if(child3 == null){
+            counter++;
         }
         return counter;
     }
 
     public int amountOfKeys(){
         int count = 0;
-        for(Comparable key : keys){
-            if(key != null){
-                count++;
-            }
+        if(key1 != null){
+            count++;
+        }
+        if(key2 != null){
+            count++;
         }
         return count;
     }
 
-    public boolean removeValue(Comparable o){
-        if(keys[0] == o){
-            keys[0] = keys[1];
-            keys[1] = null;
+    public boolean removeValue(Comparable<E> o){
+        if(key1 == o){
+            key1 = key2;
+            key2 = null;
             return true;
         }
-        else if(keys[1] == o){
-            keys[1] = null;
+        else if(key2 == o){
+            key2 = null;
             return true;
         }
         return false;
     }
 
     public void removeChild(Node node){
-        for(int i=0 ; i<children.length ; i++){
-            if(children[i] == node){
-                children[i] = null;
-            }
+        if(child1 == node){
+            child1 = null;
+        }
+        if(child2 == node){
+            child2 = null;
+        }
+        if(child3 == node){
+            child3 = null;
         }
     }
 
     //naar welk kind(index) zou dit value moeten gaan (gebaseerd op waarde t.o.v. keys) -> kleiner dan key 1 -> links, tussen de twee -> midden etc...
-    public int whatChild(Comparable value){
-        if(keys[0].compareTo(value) == 1){
-            return 0;
+    public int whatChild(E value){
+        if(key1.compareTo(value) == 1){
+            return 1;
         }
-        else if(keys[1] == null || keys[1].compareTo(value) == -1){
-            return 2;
+        else if(key2 == null || key2.compareTo(value) == -1){
+            return 3;
         }
-        return 1;
+        return 2;
     }
 
-    public Node[] getChildren(){
-        return children;
-    }
-
-    public boolean addChild(Node child){
+    public boolean addChild(Node<E> child){
         if(child == null){
             return false;
         }
         child.setParent(this);
-        int index = whatChild(child.getValue()[0]);
-        if(keys[0].compareTo(child.getValue()[0]) == 1){
-            children[0] = child;
+        int index = whatChild(child.getKey1());
+        if(key1.compareTo(child.getKey1()) == 1){
+            child1 = child;
             return true;
         }
-        if(keys[1] == null || keys[1].compareTo(child.getValue()[0]) == -1){
-            children[2] = child;
+        if(key2 == null || key2.compareTo(child.getKey1()) == -1){
+            child3 = child;
             return true;
         }
         else{
-            children[1] = child;
+            child2 = child;
             return true;
         }
     }
     //mag enkel met node met maar 1 key, wordt niet getest, specifiek gebruikt om binaire boom toe te voegen aan 1 sleutel ouder
-    public boolean addNode(Node node){
+    public boolean addNode(Node<E> node){
         if(node == null){
             return false;
         }
-        if(addKey(node.getValue()[0])){
+        if(addKey(node.getKey1())){
             //organisatie van kinderen bepalen, 2 scenarios: ofwel is teogevoege node kleiner ofwel groter
-            if(keys[1] == node.getValue()[0]){
-                this.addChild(node.getChildren()[0]);
-                this.addChild(node.getChildren()[2]);
+            if(key1 == node.getKey1()){
+                this.addChild(node.getChild1());
+                this.addChild(node.getChild3());
             }
             else{
-                node.addChild(children[0]);
-                this.addChild(node.getChildren()[0]);
-                this.addChild(node.getChildren()[1]);
+                this.addChild(node.getChild1());
+                this.addChild(node.getChild3());
             }
             return true;
         }
         return false;
     }
 
-    public void setParent(Node parent){
+    public void setParent(Node<E> parent){
         this.parent = parent;
     }
 
-    public Node getParent(){
+    public Node<E> getParent(){
         return parent;
     }
 
-    public void setKeys(Comparable[] keys){
-        this.keys = keys;
+    public void setKeys(E key1, E key2){
+        addKey(key1);
+        addKey(key2);
     }
 
-    public boolean addKey(Comparable key){
-        if(keys[1] == null){
-            if(key.compareTo(keys[0]) == 1){
-                keys[1] = key;
+    public boolean addKey(E key){
+        if(key2 == null){
+            if(key.compareTo(key1) == 1){
+                key2 = key;
             }
             else{
-                keys[1] = keys[0];
-                keys[0] = key;
+                key2 = key1;
+                key1 = key;
             }
             return true;
         }
