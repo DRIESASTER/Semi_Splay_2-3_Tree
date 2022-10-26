@@ -13,6 +13,12 @@ public class Node<E extends Comparable<E>> {
     private E key1 = null;
     private E key2 = null;
 
+
+    //node word aangemaakt
+    public Node(E value){
+        key1 = value;
+    }
+
     public Node<E> getChild1(){
         return child1;
     }
@@ -44,12 +50,6 @@ public class Node<E extends Comparable<E>> {
     }
 
     private Node<E> parent = null;
-
-
-    //node word aange
-    public Node(E value){
-        key1 = value;
-    }
 
     public void clearChildren(){
         child1 = null;
@@ -168,8 +168,13 @@ public class Node<E extends Comparable<E>> {
     }
 
     public void setKeys(E key1, E key2){
-        addKey(key1);
-        addKey(key2);
+        this.key1 = key1;
+        this.key2 = key2;
+    }
+
+    public void emptyKeys(){
+        key1 = null;
+        key2 = null;
     }
 
     public boolean addKey(E key){

@@ -113,7 +113,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             right = new Node(parent.getKey2());
             left.addChild(parent.getChild1());
             left.addChild(child.getChild1());
-            right.addChild(child.getChild2());
+            right.addChild(child.getChild3());
             right.addChild(parent.getChild3());
             subRoot.addChild(left);
             subRoot.addChild(right);
@@ -121,42 +121,111 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
         }
     }
 
+    //zoekt het vervangende blad van een hogere node; -1=links, 1=rechts
+    public Node<E> getReplacementLeaf(Node<E> root, int direction){
+        if(root == null){
+            return null;
+        }
+        if(root.emptyChildren() == 3){
+            return root;
+        }
+        if(direction == -1){
+            return getReplacementLeaf(root.getChild3(), -1);
+        }
+        if(direction == 1){
+            return getReplacementLeaf(root.getChild1(), 1);
+        }
+        return null;
+    }
+
     @Override
     public boolean remove(E val) {
         //we vinden eerst de node die we nodig hebben
-        Node node = containsRecursive(val, root);
+        Node<E> node = containsRecursive(val, root);
 
-        //als het 2 keys heeft kunnen we gewoon 1 van de 2 verwijderen
-        if(node.getKey1() != null && node.getKey2() != null){
-            node.removeValue(val);
+        Node<E> leftReplacement = null;
+        Node<E> rightReplacement = null;
+
+        //vervangen value met een van de leaf replacements
+        //als het de te removen node slechts 1 key heeft
+        if(node.getKey2() == null){
+            leftReplacement = getReplacementLeaf(node.getChild1(), -1);
+            //als linkerReplacement 2 keys heeft kunnen we er gewoon de grootste van nemen
+            if(leftReplacement != null && leftReplacement.getKey2() != null){
+                node.setKeys(leftReplacement.getKey2(), null);
+                leftReplacement.setKeys(leftReplacement.getKey1(), null);
+                return true;
+            }
+            //anders moeten rechts eens gaan zoeken
+            rightReplacement = getReplacementLeaf(node.getChild3(), 1);
+            if(rightReplacement != null && rightReplacement.getKey2() != null){
+                node.setKeys(rightReplacement.getKey1(), null);
+                rightReplacement.setKeys(rightReplacement.getKey2(), null);
+            }
+            //helaas is het toch niet zo gemakkelijk en moeten we nu met een lege leaf node werken
+            node.setKeys(leftReplacement.getKey1(), null);
+            leftReplacement.emptyKeys();
+            //van het lege blad afgeraken
+            removeEmpty(leftReplacement.getParent(), leftReplacement);
             return true;
         }
-
-
-
-        if(node.getKey1() == val){
-
+        //als het de 1e key is die geremoved word maar er zijn er 2
+        else if(node.getKey1() == val){
+            leftReplacement = getReplacementLeaf(node.getChild1(), -1);
+            //als linkerReplacement 2 keys heeft kunnen we er gewoon de grootste van nemen
+            if(leftReplacement != null && leftReplacement.getKey2() != null){
+                node.setKeys(leftReplacement.getKey2(), node.getKey2());
+                leftReplacement.setKeys(leftReplacement.getKey1(), null);
+                return true;
+            }
+            //anders moeten rechts eens gaan zoeken
+            rightReplacement = getReplacementLeaf(node.getChild2(), 1);
+            if(rightReplacement != null && rightReplacement.getKey2() != null){
+                node.setKeys(rightReplacement.getKey1(), node.getKey2());
+                rightReplacement.setKeys(rightReplacement.getKey2(), null);
+            }
+            //helaas is het toch niet zo gemakkelijk en moeten we nu met een lege leaf node werken
+            node.setKeys(leftReplacement.getKey1(), node.getKey2());
+            leftReplacement.emptyKeys();
+            //van het lege blad afgeraken
+            removeEmpty(leftReplacement.getParent(), leftReplacement);
+            return true;
         }
-
-
-        return false;
+        //de 2 key word verwijderd
+        else{
+            leftReplacement = getReplacementLeaf(node.getChild2(), -1);
+            //als linkerReplacement 2 keys heeft kunnen we er gewoon de grootste van nemen
+            if(leftReplacement != null && leftReplacement.getKey2() != null){
+                node.setKeys(node.getKey1(), leftReplacement.getKey2());
+                leftReplacement.setKeys(leftReplacement.getKey1(), null);
+                return true;
+            }
+            //anders moeten rechts eens gaan zoeken
+            rightReplacement = getReplacementLeaf(node.getChild3(), 1);
+            if(rightReplacement != null && rightReplacement.getKey2() != null){
+                node.setKeys(node.getKey1(), rightReplacement.getKey1());
+                rightReplacement.setKeys(rightReplacement.getKey2(), null);
+            }
+            //helaas is het toch niet zo gemakkelijk en moeten we nu met een lege leaf node werken
+            node.setKeys(leftReplacement.getKey1(), node.getKey2());
+            leftReplacement.emptyKeys();
+            //van het lege blad afgeraken
+            removeEmpty(leftReplacement.getParent(), leftReplacement);
+            return true;
+        }
     }
 
 
 
     //subtree voor onze remove functie
-    public Node removeSubtree(Node<E> parent, Node<E> empty){
+    public Node removeEmpty(Node<E> parent, Node<E> empty){
             parent.removeChild(empty);
             //aantal sleutels bepalen in de subtree
             int amountOfKeys = parent.amountOfKeys();
             for(int i=1; i<4 ; i++){
-                Node<E> child = parent.getChild(i);
-                if(child != null){
-                    for(int k=1 ; k<4 ; k++){
-                        if(child.getChild(k) != null){
-                            amountOfKeys+=1;
-                        }
-                    }
+                Node<E> child = parent.getParent().getChild(i);
+                if(child != null) {
+                    amountOfKeys += child.amountOfKeys();
                 }
             }
 
@@ -173,7 +242,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                 }
 
                 //anders moeten we nog voortgaan
-                return removeSubtree(parent.getParent(), parent);
+                return removeEmpty(parent.getParent(), parent);
             }
 
             else if(amountOfKeys == 3){
@@ -191,18 +260,20 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                     newTop.addChild(right);
                 }
                 else{
-                    newTop = new Node(parent.getChild1().getKey1());
-                    Node<E> left = new Node<E>(parent.getChild1().getKey2());
+                    newTop = new Node(parent.getChild1().getKey2());
+                    Node<E> left = new Node<E>(parent.getChild1().getKey1());
                     left.addChild(parent.getChild1().getChild1());
-                    left.addChild(parent.getChild1().getChild2());
+                    left.addChild(parent.getChild1().getChild3());
                     Node<E> right = new Node<E>(parent.getKey1());
                     right.addChild(empty.getChild1());
-                    right.addChild(parent.getChild1().getChild3());
                     newTop.addChild(left);
                     newTop.addChild(right);
                 }
                 if(parent == root){
                     newTop = root;
+                }
+                else{
+                    parent.getParent().addChild(newTop);
                 }
                 return newTop;
             }
