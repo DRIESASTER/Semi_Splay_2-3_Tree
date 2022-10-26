@@ -140,6 +140,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
 
     @Override
     public boolean remove(E val) {
+        nodeCount--;
         //we vinden eerst de node die we nodig hebben
         Node<E> node = containsRecursive(val, root);
 
@@ -163,6 +164,16 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                 rightReplacement.setKeys(rightReplacement.getKey2(), null);
             }
             //helaas is het toch niet zo gemakkelijk en moeten we nu met een lege leaf node werken
+            //check of het een blad is
+            if(leftReplacement == null && rightReplacement == null){
+                if(node.getParent() != null) {
+                    removeEmpty(node.getParent(), node);
+                    return true;
+                }
+                //anders is het gwn een root zonder kinderen dus word de boom gwn leeg
+                root = null;
+                return true;
+            }
             node.setKeys(leftReplacement.getKey1(), null);
             leftReplacement.emptyKeys();
             //van het lege blad afgeraken
