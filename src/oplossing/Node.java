@@ -96,6 +96,15 @@ public class Node<E extends Comparable<E>> {
         }
         return false;
     }
+    public void rebalanceChildren(){
+        Node<E> oldChild1 = child1;
+        Node<E> oldChild2 = child2;
+        Node<E> oldChild3 = child3;
+        clearChildren();
+        addChild(oldChild1);
+        addChild(oldChild2);
+        addChild(oldChild3);
+    }
 
     public void removeChild(Node node){
         if(child1 == node){
@@ -121,6 +130,11 @@ public class Node<E extends Comparable<E>> {
     }
 
     public boolean addChild(Node<E> child){
+        //optie voor als we aan een lege node toevoegen
+        if(key1 == null && key2 == null){
+            child1 = child;
+            return true;
+        }
         if(child == null){
             return false;
         }
