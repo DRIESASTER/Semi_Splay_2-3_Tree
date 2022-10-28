@@ -2,6 +2,7 @@ package oplossing;
 
 import opgave.SearchTree;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
     Node<E> root = null;
@@ -443,6 +444,33 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
 
     @Override
     public Iterator iterator() {
-        return null;
+        return dfs().iterator();
+    }
+
+    public LinkedList<E> dfs(){
+        LinkedList<E> list = new LinkedList<>();
+        list = recursiveList(root, list);
+        return list;
+    }
+
+    public LinkedList<E> recursiveList(Node<E> node, LinkedList<E> list)
+    {
+        if (node == null)
+            return list;
+        //links recursie
+        list = recursiveList(node.getChild1(), list);
+
+        //node toevoegen
+        list.add(node.getKey1());
+
+        //evt middenrecursie
+        if(node.getKey2() != null){
+            list = recursiveList(node.getChild2(), list);
+            list.add(node.getKey2());
+        }
+
+        //rechtsrecursei
+        list = recursiveList(node.getChild3(), list);
+        return list;
     }
 }
