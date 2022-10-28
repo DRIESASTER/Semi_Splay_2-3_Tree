@@ -445,6 +445,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
     @Override
     public Iterator iterator() {
         return dfs().iterator();
+
     }
 
     public LinkedList<E> dfs(){
