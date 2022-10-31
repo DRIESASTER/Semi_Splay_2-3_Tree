@@ -52,6 +52,7 @@ public interface SearchTreeTest {
         }
     }
 
+
     @Test
     default void removeMultiple() {
         SearchTree<Integer>tree = createTree();

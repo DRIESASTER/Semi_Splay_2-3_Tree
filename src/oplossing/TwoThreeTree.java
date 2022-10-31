@@ -224,9 +224,10 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             if(rightReplacement != null && rightReplacement.getKey2() != null){
                 node.setKeys(node.getKey1(), rightReplacement.getKey1());
                 rightReplacement.setKeys(rightReplacement.getKey2(), null);
+                return true;
             }
             //helaas is het toch niet zo gemakkelijk en moeten we nu met een lege leaf node werken
-            node.setKeys(leftReplacement.getKey1(), node.getKey2());
+            node.setKeys(node.getKey1(), leftReplacement.getKey1());
             leftReplacement.emptyKeys();
             //van het lege blad afgeraken
             removeEmpty(leftReplacement.getParent(), leftReplacement);
@@ -327,12 +328,13 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                     left.addKey(parent.getKey1());
                     left.addChild(empty.getChild1());
                     newTop.addChild(parent.getChild3());
+                    newTop.addChild(left);
                 }
                 //als empty kind 3 is
                 else if(parent.getChild3() == null){
                     newTop = new Node<E>(parent.getKey1());
                     newTop.addChild(parent.getChild1());
-                    Node<E> right = new Node(parent.getChild1().getKey1());
+                    Node<E> right = new Node(parent.getChild2().getKey1());
                     right.addKey(parent.getKey2());
                     right.addChild(empty.getChild1());
                     right.addChild(parent.getChild2().getChild3());
@@ -343,7 +345,9 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                     root = newTop;
                 }
                 else{
-                    parent.addChild(newTop);
+                    parent.getParent().removeChild(parent);
+                    parent.getParent().addChild(newTop);
+                    //parent.addChild(newTop);
                 }
                 return newTop;
             }
