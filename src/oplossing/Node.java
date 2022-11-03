@@ -130,15 +130,15 @@ public class Node<E extends Comparable<E>> {
     }
 
     public boolean addChild(Node<E> child){
+        if(child == null){
+            return false;
+        }
+        child.setParent(this);
         //optie voor als we aan een lege node toevoegen
         if(key1 == null && key2 == null){
             child1 = child;
             return true;
         }
-        if(child == null){
-            return false;
-        }
-        child.setParent(this);
         int index = whatChild(child.getKey1());
         if(key1.compareTo(child.getKey1()) == 1){
             child1 = child;
@@ -159,15 +159,8 @@ public class Node<E extends Comparable<E>> {
             return false;
         }
         if(addKey(node.getKey1())){
-            //organisatie van kinderen bepalen, 2 scenarios: ofwel is teogevoege node kleiner ofwel groter
-            if(key1 == node.getKey1()){
-                this.addChild(node.getChild1());
-                this.addChild(node.getChild3());
-            }
-            else{
-                this.addChild(node.getChild1());
-                this.addChild(node.getChild3());
-            }
+            this.addChild(node.getChild1());
+            this.addChild(node.getChild3());
             return true;
         }
         return false;

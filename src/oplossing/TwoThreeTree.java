@@ -180,6 +180,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             if(rightReplacement != null && rightReplacement.getKey2() != null){
                 node.setKeys(rightReplacement.getKey1(), null);
                 rightReplacement.setKeys(rightReplacement.getKey2(), null);
+                return true;
             }
             //helaas is het toch niet zo gemakkelijk en moeten we nu met een lege leaf node werken
             node.setKeys(leftReplacement.getKey1(), null);
@@ -202,6 +203,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             if(rightReplacement != null && rightReplacement.getKey2() != null){
                 node.setKeys(rightReplacement.getKey1(), node.getKey2());
                 rightReplacement.setKeys(rightReplacement.getKey2(), null);
+                return true;
             }
             //helaas is het toch niet zo gemakkelijk en moeten we nu met een lege leaf node werken
             node.setKeys(leftReplacement.getKey1(), node.getKey2());
@@ -293,9 +295,10 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                     newTop = new Node(parent.getChild1().getKey2());
                     Node<E> left = new Node<E>(parent.getChild1().getKey1());
                     left.addChild(parent.getChild1().getChild1());
-                    left.addChild(parent.getChild1().getChild3());
+                    left.addChild(parent.getChild1().getChild2());
                     Node<E> right = new Node<E>(parent.getKey1());
                     right.addChild(empty.getChild1());
+                    right.addChild(parent.getChild1().getChild3());
                     newTop.addChild(left);
                     newTop.addChild(right);
                 }
@@ -309,47 +312,35 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             }
 
             else if(amountOfKeys == 4){
-                Node<E> newTop = null;
                 //als empty kind 1 is
                 if(parent.getChild1() == null){
-                    newTop = new Node(parent.getKey2());
-                    Node<E> left = new Node<>(parent.getKey1());
-                    left.addKey(parent.getChild2().getKey1());
-                    left.addChild(parent.getChild2().getChild1());
-                    left.addChild(parent.getChild2().getChild3());
-                    left.addChild(empty.getChild1());
-                    newTop.addChild(parent.getChild3());
-                    newTop.addChild(left);
+                    empty.setKeys(parent.getKey1(), parent.getChild2().getKey1());
+                    empty.addChild(parent.getChild2().getChild1());
+                    empty.addChild(parent.getChild2().getChild3());
+                    parent.removeChild(parent.getChild2());
+                    parent.setKeys(parent.getKey2(), null);
+                    parent.addChild(empty);
                 }
                 //als empty kind 2 is
                 else if(parent.getChild2() == null){
-                    newTop = new Node<E>(parent.getKey2());
-                    Node<E> left = parent.getChild1();
-                    left.addKey(parent.getKey1());
-                    left.addChild(empty.getChild1());
-                    newTop.addChild(parent.getChild3());
-                    newTop.addChild(left);
+                    parent.getChild1().setKeys(parent.getChild1().getKey1(), parent.getKey1());
+                    parent.getChild1().rebalanceChildren();
+                    parent.getChild1().addChild(empty.getChild1());
+                    parent.setKeys(parent.getKey2(), null);
                 }
                 //als empty kind 3 is
                 else if(parent.getChild3() == null){
-                    newTop = new Node<E>(parent.getKey1());
-                    newTop.addChild(parent.getChild1());
-                    Node<E> right = new Node(parent.getChild2().getKey1());
-                    right.addKey(parent.getKey2());
-                    right.addChild(empty.getChild1());
-                    right.addChild(parent.getChild2().getChild3());
-                    right.addChild(parent.getChild2().getChild1());
-                    newTop.addChild(right);
+                    parent.getChild1().setKeys(parent.getChild1().getKey1(), parent.getKey1());
+                    parent.getChild1().rebalanceChildren();
+                    parent.getChild1().addChild(parent.getChild2().getChild1());
+                    empty.setKeys(parent.getKey2(), null);
+                    empty.rebalanceChildren();
+                    empty.addChild(parent.getChild2().getChild3());
+                    parent.setKeys(parent.getChild2().getKey1(), null);
+                    parent.addChild(empty);
+                    parent.removeChild(parent.getChild2());
                 }
-                if(parent.getParent() == null){
-                    root = newTop;
-                }
-                else{
-                    parent.getParent().removeChild(parent);
-                    parent.getParent().addChild(newTop);
-                    //parent.addChild(newTop);
-                }
-                return newTop;
+                return parent;
             }
             else if(amountOfKeys == 5){
                 //todo
@@ -378,7 +369,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                         E parentOldKey2 = parent.getKey2();
                         parent.setKeys(parent.getChild2().getKey1(), parent.getChild3().getKey1());
                         parent.getChild2().setKeys(parentOldKey2, null);
-                        parent.getChild2().removeChild(parent.getChild1());
+                        parent.getChild2().removeChild(parent.getChild2().getChild1());
                         parent.getChild2().rebalanceChildren();
                         parent.getChild2().addChild(key2Child.getChild1());
                         key2Child.setKeys(key2Child.getKey2(), null);
@@ -400,7 +391,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                         empty.addChild(parent.getChild3().getChild1());
                         parent.setKeys(parent.getKey1(), parent.getChild3().getKey1());
                         parent.getChild3().removeChild(parent.getChild3().getChild1());
-                        parent.getChild3().removeValue(parent.getKey1());
+                        parent.getChild3().removeValue(parent.getKey2());
                         parent.getChild3().rebalanceChildren();
                     }
                 }
@@ -416,8 +407,8 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
                         parent.getChild2().rebalanceChildren();
                         parent.getChild2().addChild(parent.getChild1().getChild3());
                         parent.getChild1().removeChild(parent.getChild1().getChild3());
-                        parent.getChild1().removeValue(parent.getChild1().getKey2());
                         parent.getChild1().rebalanceChildren();
+                        parent.getChild1().setKeys(parent.getChild1().getKey1(), null);
                     }
                     else{
                         empty.setKeys(parent.getKey2(), null);
@@ -434,7 +425,34 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             }
 
             else if(amountOfKeys == 6){
-                //todo
+                if(parent.getChild1() == null){
+                    empty.setKeys(parent.getKey1(), null);
+                    empty.addChild(parent.getChild2().getChild1());
+                    parent.setKeys(parent.getChild2().getKey1(), parent.getKey2());
+                    parent.getChild2().removeChild(parent.getChild2().getChild1());
+                    parent.getChild2().setKeys(parent.getChild2().getKey2(), null);
+                    parent.getChild2().rebalanceChildren();
+                }
+                else if(parent.getChild2() == null){
+                    empty.setKeys(parent.getKey1(), null);
+                    empty.rebalanceChildren();
+                    empty.addChild(parent.getChild1().getChild3());
+                    parent.setKeys(parent.getChild1().getKey2(), parent.getKey2());
+                    parent.getChild1().removeChild(parent.getChild1().getChild3());
+                    parent.getChild1().setKeys(parent.getChild1().getKey1(), null);
+                    parent.getChild1().rebalanceChildren();
+                }
+                else{
+                    empty.setKeys(parent.getKey2(), null);
+                    empty.rebalanceChildren();
+                    empty.addChild(parent.getChild2().getChild3());
+                    parent.setKeys(parent.getKey1(), parent.getChild2().getKey2());
+                    parent.getChild2().removeChild(parent.getChild2().getChild3());
+                    parent.getChild2().setKeys(parent.getChild2().getKey1(), null);
+                    parent.getChild2().rebalanceChildren();
+                }
+                parent.addChild(empty);
+                return parent;
             }
 
             return null;
