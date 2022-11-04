@@ -215,6 +215,7 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             removeEmpty(leftReplacement.getParent(), leftReplacement);
             return true;
         }
+
         //de 2 key word verwijderd
         else{
             leftReplacement = getReplacementLeaf(node.getChild2(), -1);
