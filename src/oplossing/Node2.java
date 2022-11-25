@@ -1,33 +1,33 @@
 package oplossing;
 
-public class Node<E extends Comparable<E>> {
+public class Node2<E extends Comparable<E>> {
     //private Node<E>[] children = (Node<E>[]) Array.newInstance(this.getClass(), 3);
     //private E[] keys = (E[]) Array.newInstance(Comparable.class, 2);
     //private Comparable<E>[] keys = new Comparable[2];
-    private Node<E> child1 = null;
-    private Node<E> child2 = null;
-    private Node<E> child3 = null;
+    private Node2<E> child1 = null;
+    private Node2<E> child2 = null;
+    private Node2<E> child3 = null;
 
     private E key1 = null;
     private E key2 = null;
 
 
     //node word aangemaakt
-    public Node(E value){
+    public Node2(E value){
         key1 = value;
     }
 
-    public Node<E> getChild1(){
+    public Node2<E> getChild1(){
         return child1;
     }
-    public Node<E> getChild2(){
+    public Node2<E> getChild2(){
         return child2;
     }
-    public Node<E> getChild3(){
+    public Node2<E> getChild3(){
         return child3;
     }
 
-    public Node<E> getChild(int childNr){
+    public Node2<E> getChild(int childNr){
         if(childNr == 1){
             return child1;
         }
@@ -47,7 +47,7 @@ public class Node<E extends Comparable<E>> {
         return key2;
     }
 
-    private Node<E> parent = null;
+    private Node2<E> parent = null;
 
     public void clearChildren(){
         child1 = null;
@@ -95,16 +95,16 @@ public class Node<E extends Comparable<E>> {
         return false;
     }
     public void rebalanceChildren(){
-        Node<E> oldChild1 = child1;
-        Node<E> oldChild2 = child2;
-        Node<E> oldChild3 = child3;
+        Node2<E> oldChild1 = child1;
+        Node2<E> oldChild2 = child2;
+        Node2<E> oldChild3 = child3;
         clearChildren();
         addChild(oldChild1);
         addChild(oldChild2);
         addChild(oldChild3);
     }
 
-    public void removeChild(Node node){
+    public void removeChild(Node2 node){
         if(child1 == node){
             child1 = null;
         }
@@ -127,32 +127,32 @@ public class Node<E extends Comparable<E>> {
         return 2;
     }
 
-    public boolean addChild(Node<E> child){
+    public void addChild(Node2<E> child){
         if(child == null){
-            return false;
+            return;
         }
         child.setParent(this);
         //optie voor als we aan een lege node toevoegen
         if(key1 == null && key2 == null){
             child1 = child;
-            return true;
+            return;
         }
         int index = whatChild(child.getKey1());
         if(key1.compareTo(child.getKey1()) == 1){
             child1 = child;
-            return true;
+            return;
         }
         if(key2 == null || key2.compareTo(child.getKey1()) == -1){
             child3 = child;
-            return true;
+            return;
         }
         else{
             child2 = child;
-            return true;
+            return;
         }
     }
     //mag enkel met node met maar 1 key, wordt niet getest, specifiek gebruikt om binaire boom toe te voegen aan 1 sleutel ouder
-    public boolean addNode(Node<E> node){
+    public boolean addNode(Node2<E> node){
         if(node == null){
             return false;
         }
@@ -164,11 +164,11 @@ public class Node<E extends Comparable<E>> {
         return false;
     }
 
-    public void setParent(Node<E> parent){
+    public void setParent(Node2<E> parent){
         this.parent = parent;
     }
 
-    public Node<E> getParent(){
+    public Node2<E> getParent(){
         return parent;
     }
 
