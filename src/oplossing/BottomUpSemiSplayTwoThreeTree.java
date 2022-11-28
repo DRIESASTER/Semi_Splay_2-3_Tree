@@ -307,6 +307,9 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                 node.getParent().removeChild(node);
             }
             node.removeValue(e);
+            if(rootCheck){
+                return true;
+            }
             splay(toSplay);
             return true;
         }
