@@ -127,6 +127,20 @@ public class Node2<E extends Comparable<E>> {
         return 2;
     }
 
+    public int getAmountOfChildren(){
+        int count = 0;
+        if(child1 != null){
+            count++;
+        }
+        if(child2 != null){
+            count++;
+        }
+        if(child3 != null){
+            count++;
+        }
+        return count;
+    }
+
     public void addChild(Node2<E> child){
         if(child == null){
             return;
