@@ -51,12 +51,14 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
     public boolean add(E newVal) {
         if(root == null){
             root = new Node2<>(newVal);
+            nodeCount++;
             return true;
         }
 
         if(contains(newVal)){
             return false;
         }
+        nodeCount++;
 
         Node2<E> leaf = findLeaf(root, newVal);
         if(leaf.getKey2() == null){
@@ -294,6 +296,8 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
         if(node == null){
             return false;
         }
+
+        nodeCount--;
 
         Boolean rootCheck = node == root;
 
