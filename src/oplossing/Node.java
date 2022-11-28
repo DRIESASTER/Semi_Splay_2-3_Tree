@@ -20,6 +20,23 @@ public class Node<E extends Comparable<E>> {
     public Node<E> getChild1(){
         return child1;
     }
+
+    public boolean contains(E value){
+        if(key1.equals(value) || (key2 != null && key2.equals(value))){
+            return true;
+        }
+        if(child1 != null && ((child1.getKey1() != null && child1.getKey1().equals(value)) || (child1.getKey2() != null && child1.getKey2().equals(value)))){
+            return true;
+        }
+        if(child2 != null && ((child2.getKey1() != null && child2.getKey1().equals(value)) || (child2.getKey2() != null && child2.getKey2().equals(value)))){
+            return true;
+        }
+        if(child3 != null && ((child3.getKey1() != null && child3.getKey1().equals(value)) || (child3.getKey2() != null && child3.getKey2().equals(value)))){
+            return true;
+        }
+
+        return false;
+    }
     public Node<E> getChild2(){
         return child2;
     }
