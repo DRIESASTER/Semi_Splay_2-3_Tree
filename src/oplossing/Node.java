@@ -99,6 +99,20 @@ public class Node<E extends Comparable<E>> {
         return count;
     }
 
+    public int getAmountOfChildren(){
+        int count = 0;
+        if(child1 != null){
+            count++;
+        }
+        if(child2 != null){
+            count++;
+        }
+        if(child3 != null){
+            count++;
+        }
+        return count;
+    }
+
     public boolean removeValue(Comparable<E> o){
         if(key1 == o){
             key1 = key2;

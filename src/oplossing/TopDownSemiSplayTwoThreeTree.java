@@ -55,11 +55,179 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
         return true;
     }
 
-    @Override
     public boolean remove(E e) {
-        //todo
+        Node<E> node = containsRecursive(e, root);
+        Node<E> toSplay = node.getParent();
+
+        if(node == null){
+            return false;
+        }
+
+        nodeCount--;
+
+        Boolean rootCheck = node == root;
+
+        //als het een leaf is kunnen we de waarde er gewoon uithalen
+        if(node.getChild1() == null && node.getChild2() == null && node.getChild3() == null){
+            if(node.getKey2() == null){
+                if(rootCheck){
+                    root = null;
+                    return true;
+                }
+                node.getParent().removeChild(node);
+            }
+            node.removeValue(e);
+            if(rootCheck){
+                return true;
+            }
+            splay(toSplay, toSplay.getKey1());
+            return true;
+        }
+
+        if(node.getKey2() == null){
+            if (node.getChild1() == null){
+                if (node == root){
+                    root = node.getChild3();
+                    root.setParent(null);
+                } else {
+                    node.getParent().addChild(node.getChild3());
+                }
+            } else if (node.getChild3() == null){
+                if (node == root){
+                    root = node.getChild1();
+                    root.setParent(null);
+                } else {
+                    node.getParent().addChild(node.getChild1());
+                }
+            } else {
+                //heeft 2 kinderen
+                //we vervangen hier de verwijderde top door de 1e sleutel van het kleinste rechterblad
+                Node<E> smallestRightNode = smallestRightChild (node);
+                node.setKeys(smallestRightNode.getKey1(), null);
+                if (smallestRightNode.getKey2() == null){
+                    smallestRightNode.getParent().removeChild(smallestRightNode);
+                    smallestRightNode.getParent().addChild(smallestRightNode.getChild3());
+                } else {
+                    smallestRightNode.setKeys(smallestRightNode.getKey2(), null);
+                    smallestRightNode.rebalanceChildren();
+                }
+                splay(smallestRightNode.getParent(), smallestRightNode.getParent().getKey1());
+                return true;
+            }
+        }
+        else {
+            int amountOfChildren = node.getAmountOfChildren();
+            Node<E> child1 = node.getChild1();
+            Node<E> child2 = node.getChild2();
+            Node<E> child3 = node.getChild3();
+            if (amountOfChildren == 2){
+                if (e.equals(node.getKey1())){
+                    if(node.getChild3() == null){
+                        //sws een middelste kind dat omhoog geschoven moet worden
+                        Node<E> rightChild = new Node<>(node.getKey2());
+                        rightChild.addChild(child2.getChild3());
+                        node.setKeys(child2.getKey1(), child2.getKey2());
+                        node.removeChild(child2);
+                        if(child2.getChild1() != null){
+                            node.addChild(child2.getChild1());
+                            node.getChild1().addChild(child1);
+                        }
+                        node.addChild(rightChild);
+                    }
+
+                    else {
+                        node.setKeys(node.getKey2(), null);
+                        node.rebalanceChildren();
+                    }
+                } else {
+                    if(node.getChild1() == null){
+                        Node<E> leftChild = new Node<>(node.getKey1());
+                        leftChild.addChild(child2.getChild1());
+                        node.setKeys(child2.getKey1(), child2.getKey2());
+                        node.removeChild(child2);
+                        if(child2.getChild1() != null){
+                            node.addChild(child2.getChild1());
+                            node.getChild1().addChild(child1);
+                        }
+                        node.addChild(leftChild);
+                    }
+                    else{
+                        node.setKeys(node.getKey1(), null);
+                        node.rebalanceChildren();
+                    }
+                }
+            } else if (amountOfChildren == 1){
+                if (e.equals(node.getKey1())){
+                    node.setKeys(node.getKey2(), null);
+                } else {
+                    node.setKeys(node.getKey1(), null);
+                }
+                node.rebalanceChildren();
+            } else {
+                Node<E> replacementNode = null;
+                Node<E> extraChild = null;
+                if(e.equals(node.getKey1())){
+                    replacementNode = largestLeftChild(node);
+                    extraChild = replacementNode.getChild1();
+                }
+                else{
+                    replacementNode = smallestRightChild(node);
+                    extraChild = replacementNode.getChild3();
+                }
+                if (replacementNode.getKey2() == null){
+                    if(e.equals(node.getKey1())) {
+                        node.setKeys(replacementNode.getKey1(), node.getKey2());
+                    }
+                    else {
+                        node.setKeys(node.getKey1(), replacementNode.getKey1());
+                    }
+                    replacementNode.getParent().removeChild(replacementNode);
+                    replacementNode.getParent().addChild(extraChild);
+                } else {
+                    if(e.equals(node.getKey1())) {
+                        node.setKeys(replacementNode.getKey2(), node.getKey2());
+                        replacementNode.setKeys(replacementNode.getKey1(), null);
+                        replacementNode.rebalanceChildren();
+                    }
+                    else {
+                        node.setKeys(node.getKey1(), replacementNode.getKey1());
+                        replacementNode.setKeys(replacementNode.getKey2(), null);
+                        replacementNode.rebalanceChildren();
+                    }
+                }
+                splay(replacementNode.getParent(), replacementNode.getParent().getKey1());
+                return true;
+            }
+        }
+        if (!rootCheck){
+            splay(node.getParent(), node.getParent().getKey1());
+        }
         return true;
     }
+
+
+    public Node<E> smallestRightChild (Node<E> node) {
+        return smallestRightChildRecursive(node.getChild3());
+    }
+
+    public Node<E> smallestRightChildRecursive (Node<E> node) {
+        if(node.getChild1() == null){
+            return node;
+        }
+        return smallestRightChildRecursive(node.getChild1());
+    }
+
+    public Node<E> largestLeftChild (Node<E> node) {
+        return largestLeftChildRecursive(node.getChild1());
+    }
+
+    public Node<E> largestLeftChildRecursive (Node<E> node) {
+        if(node.getChild3() == null){
+            return node;
+        }
+        return largestLeftChildRecursive(node.getChild3());
+    }
+
 
     public void splay(Node<E> val, E keyValue){
         if(val.getParent() == null || val.getParent() == root){
