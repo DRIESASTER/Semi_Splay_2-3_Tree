@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements SearchTree<E> {
-    Node<E> root = null;
+    Node2<E> root = null;
     int nodeCount = 0;
     @Override
     public int size() {
@@ -26,7 +26,7 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
     @Override
     public boolean add(E newVal) {
         if(root == null){
-            root = new Node<>(newVal);
+            root = new Node2<E>(newVal);
             nodeCount++;
             return true;
         }
@@ -36,7 +36,7 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
         }
         nodeCount++;
 
-        Node<E> leaf = findLeaf(root, newVal);
+        Node2<E> leaf = findLeaf(root, newVal);
         if(leaf.getKey2() == null){
             if(newVal.compareTo(leaf.getKey1()) == 1){
                 leaf.setKeys(leaf.getKey1(), newVal);
@@ -45,23 +45,24 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 leaf.setKeys(newVal, leaf.getKey1());
             }
             leaf.rebalanceChildren();
-            splay(leaf, newVal);
+            splay(root, newVal);
         }
         else{
-            Node<E> newLeaf = new Node<>(newVal);
+            Node2<E> newLeaf = new Node2<E>(newVal);
             leaf.addChild(newLeaf);
-            splay(newLeaf, newVal);
+            splay(root, newVal);
         }
         return true;
     }
 
     public boolean remove(E e) {
-        Node<E> node = containsRecursive(e, root);
-        Node<E> toSplay = node.getParent();
+        Node2<E> node = containsRecursive(e, root);
 
         if(node == null){
             return false;
         }
+
+        E toSplay = null;
 
         nodeCount--;
 
@@ -80,7 +81,7 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
             if(rootCheck){
                 return true;
             }
-            splay(toSplay, toSplay.getKey1());
+            splay(root, node.getParent().getKey1());
             return true;
         }
 
@@ -102,37 +103,49 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
             } else {
                 //heeft 2 kinderen
                 //we vervangen hier de verwijderde top door de 1e sleutel van het kleinste rechterblad
-                Node<E> smallestRightNode = smallestRightChild (node);
+                Node2<E> smallestRightNode = smallestRightChild (node);
                 node.setKeys(smallestRightNode.getKey1(), null);
                 if (smallestRightNode.getKey2() == null){
                     smallestRightNode.getParent().removeChild(smallestRightNode);
                     smallestRightNode.getParent().addChild(smallestRightNode.getChild3());
+                    splay(root, smallestRightNode.getParent().getKey1());
                 } else {
                     smallestRightNode.setKeys(smallestRightNode.getKey2(), null);
                     smallestRightNode.rebalanceChildren();
+                    splay(root, smallestRightNode.getParent().getKey1());
                 }
-                splay(smallestRightNode.getParent(), smallestRightNode.getParent().getKey1());
                 return true;
             }
         }
         else {
             int amountOfChildren = node.getAmountOfChildren();
-            Node<E> child1 = node.getChild1();
-            Node<E> child2 = node.getChild2();
-            Node<E> child3 = node.getChild3();
+            Node2<E> child1 = node.getChild1();
+            Node2<E> child2 = node.getChild2();
+            Node2<E> child3 = node.getChild3();
             if (amountOfChildren == 2){
                 if (e.equals(node.getKey1())){
                     if(node.getChild3() == null){
-                        //sws een middelste kind dat omhoog geschoven moet worden
-                        Node<E> rightChild = new Node<>(node.getKey2());
-                        rightChild.addChild(child2.getChild3());
-                        node.setKeys(child2.getKey1(), child2.getKey2());
-                        node.removeChild(child2);
-                        if(child2.getChild1() != null){
-                            node.addChild(child2.getChild1());
-                            node.getChild1().addChild(child1);
+                        Node2<E> smallesMiddleChild = smallestRightChildRecursive(child2);
+                        node.setKeys(smallesMiddleChild.getKey1(), node.getKey2());
+                        if(smallesMiddleChild.getKey2() == null){
+                            smallesMiddleChild.getParent().removeChild(smallesMiddleChild);
+                            smallesMiddleChild.getParent().addChild(smallesMiddleChild.getChild3());
                         }
-                        node.addChild(rightChild);
+                        else{
+                            smallesMiddleChild.setKeys(smallesMiddleChild.getKey2(), null);
+                            smallesMiddleChild.rebalanceChildren();
+                        }
+//                        //sws een middelste kind dat omhoog geschoven moet worden
+//                        Node2<E> rightChild = new Node2<>(node.getKey2());
+//                        rightChild.addChild(child2.getChild3());
+//                        node.setKeys(child2.getKey1(), child2.getKey2());
+//                        node.removeChild(child2);
+//                        node.addChild(child2.getChild2());
+//                        if(child2.getChild1() != null){
+//                            node.addChild(child2.getChild1());
+//                            node.getChild1().addChild(child1);
+//                        }
+//                        node.addChild(rightChild);
                     }
 
                     else {
@@ -141,21 +154,33 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                     }
                 } else {
                     if(node.getChild1() == null){
-                        Node<E> leftChild = new Node<>(node.getKey1());
-                        leftChild.addChild(child2.getChild1());
-                        node.setKeys(child2.getKey1(), child2.getKey2());
-                        node.removeChild(child2);
-                        if(child2.getChild1() != null){
-                            node.addChild(child2.getChild1());
-                            node.getChild1().addChild(child1);
+                        Node2<E> largestMiddleChild = largestLeftChildRecursive(child2);
+                        if(largestMiddleChild.getKey2() == null){
+                            node.setKeys(node.getKey1(), largestMiddleChild.getKey1());
+                            largestMiddleChild.getParent().removeChild(largestMiddleChild);
+                            largestMiddleChild.getParent().addChild(largestMiddleChild.getChild1());
                         }
-                        node.addChild(leftChild);
+                        else{
+                            node.setKeys(node.getKey1(), largestMiddleChild.getKey2());
+                            largestMiddleChild.setKeys(largestMiddleChild.getKey1(), null);
+                            largestMiddleChild.rebalanceChildren();
+                        }
+//                        Node2<E> leftChild = new Node2<>(node.getKey1());
+//                        leftChild.addChild(child2.getChild1());
+//                        node.setKeys(child2.getKey1(), child2.getKey2());
+//                        node.removeChild(child2);
+//                        if(child2.getChild1() != null){
+//                            node.addChild(child2.getChild1());
+//                            node.getChild1().addChild(child1);
+//                        }
+//                        node.addChild(leftChild);
                     }
                     else{
                         node.setKeys(node.getKey1(), null);
                         node.rebalanceChildren();
                     }
                 }
+                return true;
             } else if (amountOfChildren == 1){
                 if (e.equals(node.getKey1())){
                     node.setKeys(node.getKey2(), null);
@@ -164,8 +189,8 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 }
                 node.rebalanceChildren();
             } else {
-                Node<E> replacementNode = null;
-                Node<E> extraChild = null;
+                Node2<E> replacementNode = null;
+                Node2<E> extraChild = null;
                 if(e.equals(node.getKey1())){
                     replacementNode = largestLeftChild(node);
                     extraChild = replacementNode.getChild1();
@@ -195,33 +220,33 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                         replacementNode.rebalanceChildren();
                     }
                 }
-                splay(replacementNode.getParent(), replacementNode.getParent().getKey1());
+                splay(root, replacementNode.getParent().getKey1());
                 return true;
             }
         }
         if (!rootCheck){
-            splay(node.getParent(), node.getParent().getKey1());
+            splay(root, node.getKey1());
         }
         return true;
     }
 
 
-    public Node<E> smallestRightChild (Node<E> node) {
+    public Node2<E> smallestRightChild (Node2<E> node) {
         return smallestRightChildRecursive(node.getChild3());
     }
 
-    public Node<E> smallestRightChildRecursive (Node<E> node) {
+    public Node2<E> smallestRightChildRecursive (Node2<E> node) {
         if(node.getChild1() == null){
             return node;
         }
         return smallestRightChildRecursive(node.getChild1());
     }
 
-    public Node<E> largestLeftChild (Node<E> node) {
+    public Node2<E> largestLeftChild (Node2<E> node) {
         return largestLeftChildRecursive(node.getChild1());
     }
 
-    public Node<E> largestLeftChildRecursive (Node<E> node) {
+    public Node2<E> largestLeftChildRecursive (Node2<E> node) {
         if(node.getChild3() == null){
             return node;
         }
@@ -229,19 +254,28 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
     }
 
 
-    public void splay(Node<E> val, E keyValue){
-        if(val.getParent() == null || val.getParent() == root){
+    public void splay(Node2<E> grandParent, E keyValue){
+        if(root.contains(keyValue)){
             return;
         }
 
         //it's splay time
         //eerst maak ik een normale splay die geen toppen gaat herverdelen etc
-        Node<E> parent = val.getParent();
-        Node<E> grandParent = parent.getParent();
-        Node<E> greatGrandParent = grandParent.getParent();
-        Node<E> newTop = new Node<>(null);
-        //splayen default op val 2e keer (als het moet) maar kan anders zijn
-        Node<E> nextSplay = val;
+        Node2<E> parent = grandParent.getChild(grandParent.whatChild(keyValue));
+
+        if(parent == null || parent.getChild(parent.whatChild(keyValue)) == null){
+            return;
+        }
+
+        Boolean rootCheck = grandParent == root;
+
+
+        Node2<E> val = parent.getChild(parent.whatChild(keyValue));
+        Node2<E> newTop = new Node2<>(null);
+        Node2<E> greatGrandParent = grandParent.getParent();
+
+
+
         //neem key 1 maar zou normaal nog steeds moeten kloppen
         //stel is kind1
         if(parent.whatChild(val.getKey1()) == 1){
@@ -254,33 +288,33 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 grandParent.addChild(parent.getChild3());
                 newTop.addChild(grandParent);
                 newTop.addChild(val);
-                if(greatGrandParent == null){
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
 
             //als 2e kind
             if(grandParent.whatChild(parent.getKey1()) == 2){
                 newTop.setKeys(parent.getKey1(), parent.getKey2());
                 newTop.addChild(parent.getChild2());
-                Node<E> leftGrandChild = new Node<>(grandParent.getKey1());
+                Node2<E> leftGrandChild = new Node2<>(grandParent.getKey1());
                 leftGrandChild.addChild(grandParent.getChild1());
                 leftGrandChild.addChild(val.getChild1());
                 val.addChild(leftGrandChild);
                 newTop.addChild(val);
-                Node<E> rightChild = new Node<>(grandParent.getKey2());
+                Node2<E> rightChild = new Node2<>(grandParent.getKey2());
                 rightChild.addChild(parent.getChild3());
                 rightChild.addChild(grandParent.getChild3());
                 newTop.addChild(rightChild);
-                if(greatGrandParent == null){
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
 
             //als 3e kind
@@ -293,13 +327,12 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 parent.removeChild(parent.getChild1());
                 parent.addChild(val.getChild3());
                 newTop.addChild(parent);
-                nextSplay = newTop;
-                if(greatGrandParent == null){
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
         }
         if(parent.whatChild(val.getKey1()) == 2){
@@ -311,16 +344,16 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 newTop.addChild(grandParent);
                 newTop.addChild(val);
                 newTop.addChild(parent.getChild1());
-                if(greatGrandParent == null){
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
             if(grandParent.whatChild(parent.getKey1()) == 2){
-                Node<E> leftChild = new Node<>(grandParent.getKey1());
-                Node<E> rightChild = new Node<>(grandParent.getKey2());
+                Node2<E> leftChild = new Node2<>(grandParent.getKey1());
+                Node2<E> rightChild = new Node2<>(grandParent.getKey2());
                 leftChild.addChild(grandParent.getChild1());
                 leftChild.addChild(parent.getChild1());
                 rightChild.addChild(grandParent.getChild3());
@@ -328,13 +361,13 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 parent.addChild(leftChild);
                 parent.addChild(rightChild);
                 newTop = parent;
-                if(greatGrandParent == null){
-                    newTop.setParent(null);
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    newTop.setParent(null);
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
             if(grandParent.whatChild(parent.getKey1()) == 3){
                 if(parent.getChild1() == null){
@@ -356,13 +389,13 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                     }
                     newTop.addChild(parent);
                 }
-                if(greatGrandParent == null){
-                    newTop.setParent(null);
-                    root = newTop;
-                }
-                else{
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    newTop.setParent(null);
+//                    root = newTop;
+//                }
+//                else{
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
         }
         if(parent.whatChild(val.getKey1()) == 3){
@@ -375,19 +408,18 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 grandParent.removeChild(grandParent.getChild1());
                 grandParent.addChild(val.getChild3());
                 newTop.addChild(grandParent);
-                nextSplay = newTop;
-                if(greatGrandParent == null){
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
             if(grandParent.whatChild(parent.getKey1()) == 2){
                 if(parent.getKey2() == null){
                     newTop.setKeys(parent.getKey1(), grandParent.getKey2());
                     newTop.addChild(val);
-                    Node<E> leftChild = new Node<>(grandParent.getKey1());
+                    Node2<E> leftChild = new Node2<>(grandParent.getKey1());
                     leftChild.addChild(grandParent.getChild1());
                     leftChild.addChild(parent.getChild1());
                     newTop.addChild(leftChild);
@@ -396,7 +428,7 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 else{
                     newTop.setKeys(parent.getKey2(), grandParent.getKey2());
                     newTop.addChild(val);
-                    Node<E> leftChild = new Node<>(null);
+                    Node2<E> leftChild = new Node2<>(null);
                     leftChild.setKeys(grandParent.getKey1(), parent.getKey1());
                     leftChild.addChild(parent.getChild1());
                     leftChild.addChild(grandParent.getChild1());
@@ -404,12 +436,12 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                     newTop.addChild(leftChild);
                     newTop.addChild(grandParent.getChild3());
                 }
-                if(greatGrandParent == null){
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
             if(grandParent.whatChild(parent.getKey1()) == 3){
                 newTop.setKeys(parent.getKey1(), parent.getKey2());
@@ -418,28 +450,41 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
                 grandParent.addChild(parent.getChild1());
                 newTop.addChild(grandParent);
                 newTop.addChild(val);
-                if(greatGrandParent == null){
-                    root = newTop;
-                }
-                else {
-                    greatGrandParent.addChild(newTop);
-                }
+//                if(greatGrandParent == null){
+//                    root = newTop;
+//                }
+//                else {
+//                    greatGrandParent.addChild(newTop);
+//                }
             }
         }
         //contains checked of de top of zijn kinderen de waarde bevat
-        if(root.contains(keyValue)){
+//        if(root.contains(keyValue)){
+//            return;
+//        }
+        if(rootCheck){
+            root = newTop;
+            root.setParent(null);
+        }
+        else{
+            greatGrandParent.addChild(newTop);
+        }
+        if(val.getKey1().equals(keyValue)|| (val.getKey2() != null && val.getKey2().equals(keyValue))){
             return;
         }
-        Node<E> nextStepDown = root.getChild(root.whatChild(keyValue));
-        splay(nextStepDown.getChild(nextStepDown.whatChild(keyValue)), keyValue);
+        if(newTop.getKey1() == null){
+            System.out.println("hey");
+        }
+        splay(newTop.getChild(newTop.whatChild(keyValue)), keyValue);
     }
 
     //recursieve methode waar we gewoon van een andere node als zogezegde wortel voort gaan zoeken, returned dan gezochte node
-    public Node containsRecursive(E o, Node<E> subRoot){
+    public Node2<E> containsRecursive(E o, Node2<E> subRoot){
         if(subRoot == null){
             return null;
         }
-        if(o.compareTo(subRoot.getKey1()) == 0|| (subRoot.getKey2() != null && o.compareTo(subRoot.getKey2()) == 0)){
+
+        if(o.equals(subRoot.getKey1())|| (subRoot.getKey2() != null && o.equals(subRoot.getKey2()))){
             return subRoot;
         }
 
@@ -447,7 +492,7 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
     }
 
     //recursieve methode, ga knopen af tot hij degene vindt die geen kinderen heeft
-    public Node<E> findLeaf(Node<E> node, E newVal){
+    public Node2<E> findLeaf(Node2<E> node, E newVal){
         int childNr = node.whatChild(newVal);
         if(node.getChild(childNr) == null){
             return node;
@@ -468,13 +513,13 @@ public class TopDownSemiSplayTwoThreeTree <E extends Comparable<E>> implements S
 
     }
 
-    public LinkedList<E> dfs(){
-        LinkedList<E> list = new LinkedList<>();
+    public LinkedList<Comparable> dfs(){
+        LinkedList<Comparable> list = new LinkedList<>();
         list = recursiveList(root, list);
         return list;
     }
 
-    public LinkedList<E> recursiveList(Node<E> node, LinkedList<E> list)
+    public LinkedList<Comparable> recursiveList(Node2<E> node, LinkedList<Comparable> list)
     {
         if (node == null)
             return list;

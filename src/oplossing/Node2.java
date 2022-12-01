@@ -104,7 +104,7 @@ public class Node2<E extends Comparable<E>> {
         addChild(oldChild3);
     }
 
-    public void removeChild(Node2 node){
+    public void removeChild(Node2<E> node){
         if(child1 == node){
             child1 = null;
         }
@@ -118,6 +118,9 @@ public class Node2<E extends Comparable<E>> {
 
     //naar welk kind(index) zou dit value moeten gaan (gebaseerd op waarde t.o.v. keys) -> kleiner dan key 1 -> links, tussen de twee -> midden etc...
     public int whatChild(E value){
+        if(key1 == null){
+            System.out.println("test");
+        }
         if(key1.compareTo(value) == 1){
             return 1;
         }
@@ -141,6 +144,23 @@ public class Node2<E extends Comparable<E>> {
         return count;
     }
 
+    public boolean contains(E value){
+        if(key1.equals(value) || (key2 != null && key2.equals(value))){
+            return true;
+        }
+        if(child1 != null && ((child1.getKey1() != null && child1.getKey1().equals(value)) || (child1.getKey2() != null && child1.getKey2().equals(value)))){
+            return true;
+        }
+        if(child2 != null && ((child2.getKey1() != null && child2.getKey1().equals(value)) || (child2.getKey2() != null && child2.getKey2().equals(value)))){
+            return true;
+        }
+        if(child3 != null && ((child3.getKey1() != null && child3.getKey1().equals(value)) || (child3.getKey2() != null && child3.getKey2().equals(value)))){
+            return true;
+        }
+
+        return false;
+    }
+
     public void addChild(Node2<E> child){
         if(child == null){
             return;
@@ -150,6 +170,9 @@ public class Node2<E extends Comparable<E>> {
         if(key1 == null && key2 == null){
             child1 = child;
             return;
+        }
+        if(child.getKey1() == null){
+            System.out.println("test");
         }
         int index = whatChild(child.getKey1());
         if(key1.compareTo(child.getKey1()) == 1){

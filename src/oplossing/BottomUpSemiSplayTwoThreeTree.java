@@ -109,6 +109,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -131,6 +132,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -151,6 +153,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -169,6 +172,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -188,6 +192,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -217,6 +222,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else{
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -237,6 +243,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -266,6 +273,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -281,6 +289,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
                     return;
                 }
                 else {
+                    nextSplay = newTop;
                     greatGrandParent.addChild(newTop);
                 }
             }
@@ -291,11 +300,11 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
     @Override
     public boolean remove(E e) {
         Node2<E> node = containsRecursive(e, root);
-        Node2<E> toSplay = node.getParent();
 
         if(node == null){
             return false;
         }
+        Node2<E> toSplay = node.getParent();
 
         nodeCount--;
 

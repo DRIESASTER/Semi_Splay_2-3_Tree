@@ -52,6 +52,10 @@ public class TwoThreeTree<E extends Comparable<E>> implements SearchTree<E> {
             return true;
         }
 
+        if(contains(val) == true){
+            return false;
+        }
+
         Node<E> leaf = findLeaf(root, val);
         //probeer value toe te voegen als key van het blad
         //werkt ook zonder maar is sneller zo
