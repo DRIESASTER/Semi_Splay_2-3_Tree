@@ -20,7 +20,14 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
     @Override
     public boolean contains(E o) {
         //check of gereturnde node null is
-        return containsRecursive(o, root) != null;
+        Node<E> node = containsRecursive(o, root);
+        if(node != null){
+            splay(node);
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 
@@ -55,7 +62,7 @@ public class BottomUpSemiSplayTwoThreeTree <E extends Comparable<E>> implements 
             return true;
         }
 
-        if(contains(newVal)){
+        if(containsRecursive(newVal, root) != null){
             return false;
         }
         nodeCount++;
