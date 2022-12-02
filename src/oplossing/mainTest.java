@@ -11,7 +11,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+//deze klasse bestaat puur voor mijn eigen testen en een aantal benchmarks
 public class mainTest {
 
 
@@ -23,6 +23,7 @@ public class mainTest {
         BufferedWriter searchWriter = new BufferedWriter(new FileWriter("extra/normalSearch.csv"));
         BufferedWriter searchZipfWriter = new BufferedWriter(new FileWriter("extra/zipSearch.csv"));
         Random rand = new Random();
+
 
         SearchTree<Integer> bottomUpTree = new BottomUpSemiSplayTwoThreeTree<>();
         SearchTree<Integer > topDownTree = new TopDownSemiSplayTwoThreeTree<>();
