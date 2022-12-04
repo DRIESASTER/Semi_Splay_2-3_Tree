@@ -16,28 +16,28 @@ public class mainTest {
 
 
     public static void main(String[] args) throws IOException {
-        BufferedWriter addWriter = new BufferedWriter(new FileWriter("extra/TopVsBottomAddNormal.csv"));
+        BufferedWriter addWriter = new BufferedWriter(new FileWriter("extra/addVsAdd2.csv"));
         BufferedWriter removeWriter = new BufferedWriter(new FileWriter("extra/TopVsBottomRemoveNormal.csv"));
-        BufferedWriter addZipfWriter = new BufferedWriter(new FileWriter("extra/TopVsBottomAddZipf.csv"));
+        BufferedWriter addZipfWriter = new BufferedWriter(new FileWriter("extra/addVsAdd2Zipf.csv"));
         BufferedWriter removeZipfWriter = new BufferedWriter(new FileWriter("extra/TopVsBottomRemoveZipf.csv"));
         BufferedWriter searchWriter = new BufferedWriter(new FileWriter("extra/normalSearch.csv"));
         BufferedWriter searchZipfWriter = new BufferedWriter(new FileWriter("extra/zipSearch.csv"));
         Random rand = new Random();
 
 
-        SearchTree<Integer> bottomUpTree = new BottomUpSemiSplayTwoThreeTree<>();
-        SearchTree<Integer > topDownTree = new TopDownSemiSplayTwoThreeTree<>();
+        BottomUpSemiSplayTwoThreeTree<Integer> bottomUpTree = new BottomUpSemiSplayTwoThreeTree<>();
+        SearchTree<Integer> topDownTree = new TopDownSemiSplayTwoThreeTree<>();
         SearchTree<Integer> twoThreeTree = new TwoThreeTree<>();
-        int size = 10000;
-        int testsize = 50;
+        int size = 500;
+        int testsize = 200;
 
         for (int i = 0; i < testsize; i++) {
-            searchWriter.append(String.valueOf(size + i * 10000)).append(",");
-            searchZipfWriter.append(String.valueOf(size + i * 10000)).append(",");
-            addWriter.append(String.valueOf(size + i * 10000)).append(",");
-            removeWriter.append(String.valueOf(size + i * 10000)).append(",");
-            addZipfWriter.append(String.valueOf(size + i * 10000)).append(",");
-            removeZipfWriter.append(String.valueOf(size + i * 10000)).append(",");
+            searchWriter.append(String.valueOf(size + i * 500)).append(",");
+            searchZipfWriter.append(String.valueOf(size + i * 500)).append(",");
+            addWriter.append(String.valueOf(size + i * 500)).append(",");
+            removeWriter.append(String.valueOf(size + i * 500)).append(",");
+            addZipfWriter.append(String.valueOf(size + i * 500)).append(",");
+            removeZipfWriter.append(String.valueOf(size + i * 500)).append(",");
         }
 
         addWriter.append("\n");
@@ -57,11 +57,14 @@ public class mainTest {
             for (Integer el : list) {
                 bottomUpTree.add(el);
             }
-            addWriter.append(String.valueOf(System.currentTimeMillis() - startAddNormal)).append(",");
 
+            addWriter.append(String.valueOf(System.currentTimeMillis() - startAddNormal)).append(",");
+//
             long startSearchNormal = System.currentTimeMillis();
             for (Integer el : list) {
-                bottomUpTree.contains(el);
+                for(int k=0 ; k<100 ; k++) {
+                    bottomUpTree.contains(el);
+                }
             }
             searchWriter.append(String.valueOf(System.currentTimeMillis() - startSearchNormal)).append(",");
 
@@ -80,7 +83,9 @@ public class mainTest {
 
             long startSearchZipf = System.currentTimeMillis();
             for (Integer el : zipfList) {
-                bottomUpTree.contains(el);
+                for(int k=0 ; k<100 ; k++) {
+                    bottomUpTree.contains(el);
+                }
             }
             searchZipfWriter.append(String.valueOf(System.currentTimeMillis() - startSearchZipf)).append(",");
 
@@ -91,17 +96,18 @@ public class mainTest {
             removeZipfWriter.append(String.valueOf(System.currentTimeMillis() - startRemoveZipf)).append(",");
 
 
-            size += 10000;
+            size += 500;
 //            System.out.println("jep");
 
         }
+
         addWriter.append("\n");
         removeWriter.append("\n");
         addZipfWriter.append("\n");
         removeZipfWriter.append("\n");
         searchWriter.append("\n");
         searchZipfWriter.append("\n");
-        size = 10000;
+        size = 500;
         for (int i = 0; i < testsize; i++) {
             Sampler sampler = new Sampler(rand, size);
             ZipfSampler zipfSampler = new ZipfSampler(rand, size);
@@ -118,7 +124,9 @@ public class mainTest {
             addWriter.append(String.valueOf(System.currentTimeMillis() - startAddNormal)).append(",");
             long startSearchNormal = System.currentTimeMillis();
             for (Integer el : list) {
-                assertTrue(topDownTree.contains(el));
+                for(int k=0 ; k<100 ; k++) {
+                    topDownTree.contains(el);
+                }
             }
             searchWriter.append(String.valueOf(System.currentTimeMillis() - startSearchNormal)).append(",");
 
@@ -137,7 +145,9 @@ public class mainTest {
 
             long startSearchZipf = System.currentTimeMillis();
             for (Integer el : zipfList) {
-                topDownTree.contains(el);
+                for(int k=0 ; k<100 ; k++) {
+                    topDownTree.contains(el);
+                }
             }
             searchZipfWriter.append(String.valueOf(System.currentTimeMillis() - startSearchZipf)).append(",");
 
@@ -146,7 +156,7 @@ public class mainTest {
                 topDownTree.remove(el);
             }
             removeZipfWriter.append(String.valueOf(System.currentTimeMillis() - startRemoveZipf)).append(",");
-            size += 10000;
+            size += 500;
         }
 
         addWriter.append("\n");
@@ -155,7 +165,7 @@ public class mainTest {
         removeZipfWriter.append("\n");
         searchWriter.append("\n");
         searchZipfWriter.append("\n");
-        size = 10000;
+        size = 500;
         for (int i = 0; i < testsize; i++) {
             Sampler sampler = new Sampler(rand, size);
             ZipfSampler zipfSampler = new ZipfSampler(rand, size);
@@ -171,7 +181,9 @@ public class mainTest {
             addWriter.append(String.valueOf(System.currentTimeMillis() - startAddNormal)).append(",");
             long startSearchNormal = System.currentTimeMillis();
             for (Integer el : list) {
-                twoThreeTree.contains(el);
+                for(int k=0 ; k<100 ; k++) {
+                    twoThreeTree.contains(el);
+                }
             }
             searchWriter.append(String.valueOf(System.currentTimeMillis() - startSearchNormal)).append(",");
 
@@ -190,7 +202,9 @@ public class mainTest {
 
             long startSearchZipf = System.currentTimeMillis();
             for (Integer el : zipfList) {
-                twoThreeTree.contains(el);
+                for(int k=0 ; k<100 ; k++) {
+                    twoThreeTree.contains(el);
+                }
             }
             searchZipfWriter.append(String.valueOf(System.currentTimeMillis() - startSearchZipf)).append(",");
 
@@ -199,7 +213,7 @@ public class mainTest {
                 twoThreeTree.remove(el);
             }
             removeZipfWriter.append(String.valueOf(System.currentTimeMillis() - startRemoveZipf)).append(",");
-            size += 10000;
+            size += 500;
         }
 
         addWriter.close();
@@ -210,6 +224,7 @@ public class mainTest {
         searchZipfWriter.close();
     }
 }
+
 
 //    public static void main(String[] args) {
 //        SearchTree<Integer> tree = new TopDownSemiSplayTwoThreeTree<>();
