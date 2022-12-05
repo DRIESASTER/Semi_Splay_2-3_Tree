@@ -25,9 +25,9 @@ Mijn vervangbomen voor het wegwerken van een lege top zijn hieronder te zien.
 
 ### <strong>Top-down- & Bottom-up Semi-Splay 2-3 Boom</strong>
 
-#### Vervang bomen
+#### Vervangbomen
 
-De vervangenbomen die ik voor mijn semi splay gebruikt heb zijn te zien in de onderstaande afbeeldingen. Ik heb zoveel mogelijk geprobeerd op toppen te splitsen en niet op sleutels. Ik verwacht dat op sleutels splitsen efficienter was geweest aangezien je dan meer toppen zou samenvoegen en dus vaker gebruik maakt van de 2-3 eigenschappen van de boom, maar dit leken mij al heel snel heel veel situaties die ik ging moeten coderen.
+De vervangbomen die ik voor mijn semi-splay gebruikt heb zijn te zien in de onderstaande afbeeldingen. Ik heb zoveel mogelijk geprobeerd op toppen te splitsen en niet op sleutels. Ik verwacht dat op sleutels splitsen efficienter was geweest aangezien je dan meer toppen zou samenvoegen en dus vaker gebruik maakt van de 2-3 eigenschappen van de boom, maar dit leken mij al heel snel heel veel situaties die ik ging moeten coderen.
 
 ![vervangbomen voor Semi-Splay 2-3 Bomen](splay1.png)
 ![vervangbomen voor Semi-Splay 2-3 Bomen](splay2.png)
@@ -36,7 +36,7 @@ De vervangenbomen die ik voor mijn semi splay gebruikt heb zijn te zien in de on
 
 #### Bottom-up Semi-Splay 2-3 Boom
 
-De implementatie voor mijn Bottom-up boom werkt als volgt, ik geef een node mee aan mijn splay methode die dan vervolgens steeds drie nodes, de vader en grootvader gaat samennemen en door een vervangboom gaat vervangen. Hierna splay ik nog eens op de node boven de vervangboom zodat die ook door een vervangboom vervangen word. Dit blijf ik doen tot ik aan een kind van de wortel of de wortel zit.
+De implementatie voor mijn Bottom-up boom werkt als volgt, ik geef een node mee aan mijn splay methode die dan vervolgens steeds drie nodes, de vader en grootvader van de node gaat samennemen en door een vervangboom gaat vervangen. Hierna splay ik nog eens op de node boven de vervangboom zodat die ook door een vervangboom vervangen word. Dit blijf ik doen tot ik aan een kind van de wortel of de wortel zit.
 
 ####  Top-down Semi-Splay 2-3 Boom
 
@@ -49,7 +49,7 @@ Mijn Top-down boom zijn splay methode begint te splayen bij de wortel en geef ik
 
 Het testen van het toevoegen van elementen heb ik gedaan door 50 maal een boom op te bouwen met eerst 10.000 elementen dan 20.000, 30.000...50 000 elementen. 
 
-Zoals u hieronder op de grafiek kan zien is de gewone 2-3 boom veruit het efficienst. Dit komt natuurlijk doordat we hier niet moeten splayen waar uitendelijk steeds wel een aantal operaties voor nodig zijn. Het is ook opmerkelijk dat Top-down net iets trager is dan Bottom-up, dit komt door het feit dat ik eigenlijk twee keer zoek naar in node in mijn Top-down implementatie.
+Zoals u hieronder op de grafiek kan zien is de gewone 2-3 boom veruit het efficienst. Dit komt natuurlijk doordat we hier niet moeten splayen waar uitendelijk steeds wel een aantal operaties voor nodig zijn. Het is ook opmerkelijk dat Top-down net iets trager is dan Bottom-up, dit komt door het feit dat ik eigenlijk twee keer zoek naar een node in mijn Top-down implementatie.
 
 
 ![grafiek betreffende toevoeg-operatie](toevoeg.png)
